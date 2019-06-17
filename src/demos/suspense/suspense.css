@@ -1,0 +1,17 @@
+i::before {
+  content: "...";
+  position: absolute;
+  animation: dot 3s infinite step-start both;
+}
+i::after {
+  content: "...";
+  color: transparent;
+}
+@keyframes dot {
+  33% {
+    content: ".";
+  }
+  66% {
+    content: "..";
+  }
+}

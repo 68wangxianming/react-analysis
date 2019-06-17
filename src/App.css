@@ -1,0 +1,76 @@
+.App {
+  text-align: center;
+}
+
+.nav {
+  width: 92%;
+  height: 50px;
+  font: bold 0/50px Arial;
+  text-align: center;
+  margin: 15px auto 15px;
+  margin-bottom: 80px;
+  border-radius: 8px;
+}
+.nav a {
+  display: inline-block;
+  transition: all 0.2s ease-in;
+}
+.nav a:hover {
+  transform: rotate(10deg);
+}
+.black {
+  background: #2c2c2c;
+  box-shadow: 0 7px 0 #0b0b0b;
+}
+.green {
+  background: #9cd564;
+  box-shadow: 0 7px 0 #86b65b;
+}
+
+.nav li {
+  position: relative;
+  display: inline-block;
+  padding: 0 16px;
+  font-size: 13px;
+  text-shadow: 1px 2px 4px rgba(0, 0, 0, 0.5);
+  list-style: none outside none;
+}
+
+.nav li::before,
+.nav li::after {
+  content: "";
+  position: absolute;
+  top: 14px;
+  height: 25px;
+  width: 1px;
+}
+.nav li::after {
+  right: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0),
+    rgba(255, 255, 255, 0.2) 50%,
+    rgba(255, 255, 255, 0)
+  );
+}
+.black li::before {
+  left: 0;
+  background: linear-gradient(to top, #2c2c2c, #000 50%, #2c2c2c);
+}
+.green li::before {
+  left: 0;
+  background: linear-gradient(to top, #9cd564, #7aa450 50%, #9cd564);
+}
+
+.nav li:first-child::before {
+  background: none;
+}
+.nav li:last-child::after {
+  background: none;
+}
+
+.nav a,
+.nav a:hover {
+  color: #fff;
+  text-decoration: none;
+}
