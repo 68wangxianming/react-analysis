@@ -667,5 +667,96 @@ export default Greeting;
 
 ![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/state%E5%8F%AF%E7%94%A8%E5%91%A8%E6%9C%9F.png)
 
+React 新的调度算法过滤掉了一些没用的生命周期
+
+```javascript
+import { Component } from "react";
+//废弃componentWillMount, componentWillReceiveProps, componentWillUpdate
+//新增关键getSnapshotBeforeUpdate 、getDerivedStateFromProps
+class Greeting extends Component {
+  render() {
+    return "详情见文件夹图片";
+  }
+}
+export default Greeting;
+
+  /**
+   * dom渲染前保存了快照 一变后续使用
+   */
+  //   getSnapshotBeforeUpdate(prevProps, prevState) {
+  //     // 保存滚动位置的快照
+  //     if (prevProps.list.length < this.props.list.length) {
+  //       const list = this.listRef.current;
+  //       return list.scrollHeight - list.scrollTop;
+  //     }
+  //     return null;
+  //   }
+
+  //   componentDidUpdate(prevProps, prevState, snapshot) {
+  //     // 如果有快照的值，说明已经增加的新的项.
+  //     // 调整滚动位置使得新的项不会挤走老的项
+  //     // 快照是从getSnapshotBeforeUpdate返回出来的
+  //     if (snapshot !== null) {
+  //       const list = this.listRef.current;
+  //       list.scrollTop = list.scrollHeight - snapshot;
+  //     }
+  //   }
+
+//=======================================
+
+//React 15.X 初始化和更新分别写在constructor和componentWillReceiveProps.
+// class Parent extends Component{
+//     render(){
+//         return (
+//         <Child age={18} />
+//         )
+//     }
+// }
+// class Child extends Components{
+//     constructor(props){
+//         super(props);
+//         this.state = {
+//             age: this.props.age //装载阶段初始化state
+//         }
+//     }
+//     componentWillReceiveProps(nextProps){
+//         if(nextProps.age !== this.state.age){
+//             this.setState({
+//                 age: nextProps.age
+//             }) // 修改state
+//         }
+//     }
+//     render(){...}
+// }
+//===========react16============
+// constructor(props){
+//     super(props);
+//     this.state = {
+//         age: ''
+//     }
+// }
+// static getDerivedStateFromProps(nextProps,prevState){
+//     if(nextProps.age !== prevState.age){
+//         return {
+//             age: nextProps.age
+//         }
+//     }
+//     return null;
+// }
+```
+
+### Hooks
+
+- useState 返回有状态值，以及更新这个状态值的函数
+- useEffect 接受包含命令式，可能有副作用代码的函数。
+- useContext 接受上下文对象（从React.createContext返回的值）并返回当前上下文值，
+- useReducer useState的替代方案。接受类型为(state，action) => newState的reducer，并返回与dispatch方法配对的当前状态。
+- useCallback  返回一个回忆的memoized版本，该版本仅在其中一个输入发生更改时才会更改。纯函数的输入输出确定性
+- useMemo 纯的一个记忆函数
+- useRef 返回一个可变的ref对象，其.current属性被初始化为传递的参数
+- useImperativeMethods 自定义使用ref时公开给父组件的实例值
+- useMutationEffect 更新兄弟组件之前，它在React执行其DOM改变的同一阶段同步触发
+- useLayoutEffect DOM改变后同步触发。使用它来从DOM读取布局并同步重新渲染
+
 
 
