@@ -63,7 +63,7 @@ export default (
 
 ### 普通的react组件
 
-便利的写法
+便利的写法 新增了render 新的返回类型：fragments 和 strings
 
 ```javascript
 return <h4 className="text-warning">Hello, {this.props.name}</h4>;
@@ -370,8 +370,6 @@ test()
 
 ```javascript
 import React, { Suspense, lazy } from "react";
-// import { useFetch } from "react-hooks-fetch";
-// console.log("异步加载数据", useFetch);
 //动态加载组件
 const LazyComp = lazy(() => import("./lazy"));
 
@@ -404,11 +402,6 @@ const createFetcher = promiseTask => {
 };
 const requestData = createFetcher(fetchApi);
 function SuspenseComp() {
-    // const {error,data} = useFetch("a.php");
-    // console.log("数据📚",data)
-    // if (error) return <span>出错了/(ㄒoㄒ)/~~</span>;
-    // if (!data) return null;
-    // return <span>RemoteData:{data.title}</span>;
   const data = requestData();
   return <p className="text-warning">{data}</p>;
 }
@@ -431,31 +424,240 @@ index.jsx:26 🌲--ref Data resolved
 index.jsx:27 🌺--cached {}
 index.jsx:32 🍎 Data resolved
 
+新hocks解决 原理同上
+
+```javascript
+import React, { Suspense, lazy } from "react";
+import { useFetch } from "react-hooks-fetch";
+//动态加载组件
+const LazyComp = lazy(() => import("./lazy"));
+
+function SuspenseComp() {
+    const {error,data} = useFetch("a.php");
+    console.log("数据📚",data)
+  return <p className="text-warning">{data}</p>;
+}
+
+export default () => (
+  <Suspense fallback={<div className="text-danger">loading<i></i></div>}>
+    <SuspenseComp />
+    <LazyComp />
+  </Suspense>
+);
+```
+
+### memo
+
+将函数组件转换成纯组件
+
+```javascript
+//React.memo() 是高阶函数能将函数组件转换成类似于React.PureComponent组件
+import React, { memo, Component } from "react";
+
+function Child({ seconds }) {
+  console.log("I am rendering");
+  return <div>Memo组件 seconds->{seconds} </div>;
+}
+
+function areEqual(prevProps, nextProps) {
+  if (prevProps.seconds === nextProps.seconds) {
+    return true;
+  } else {
+    return false;
+  }
+}
+// const RocketComponent = props => <div>my rocket component. {props.fuel}!</div>;
+
+// 创建一个只在prop改变时发生渲染的版本
+// const MemoizedRocketComponent = memo(RocketComponent);
+// const memocom = () => {
+//   return memo(Child, areEqual);
+// };
+const DemoComponent = memo(Child, areEqual);
+
+class Greeting extends Component {
+  render() {
+    return <DemoComponent seconds="20" />;
+  }
+}
+export default Greeting;
+
+// function Child({seconds}){
+//     console.log('I am rendering');
+//     return (
+//         <div>I am update every {seconds} seconds</div>
+//     )
+// };
+// export default React.memo(Child)
+```
 
 
 
+### Context
+
+```javascript
+//Context 主要是解决props向多层嵌套的子组件传递的问题，原理是定义了一个全局对象
+import React from "react";
+import PropTypes from "prop-types";
+
+const { Provider, Consumer } = React.createContext("default");
+
+class Parent extends React.Component {
+  state = {
+    name: "普通字符串🍌",
+    newContext: "小明"
+  };
+
+  //   getChildContext() {
+  //     return { value: this.state.newContext, name: this.state.name };
+  //   }
+  render() {
+    //    <React.Fragment> ==  <>
+    return (
+      <>
+        <div>
+          <label className="text-warning">父节点=> newContext:</label>
+          <input
+            type="text"
+            value={this.state.newContext}
+            onChange={e => this.setState({ newContext: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-info">父节点=>固定string:</label>
+          <input
+            type="text"
+            value={this.state.name}
+            onChange={e => this.setState({ name: e.target.value })}
+          />
+        </div>
+        {/* {this.props.children} */}
+        <Provider value={{ newContext: this.state.newContext, name: "普通字符串🍌" }}>
+          {this.props.children}
+        </Provider>
+      </>
+    );
+  }
+}
+
+function Child(props, context) {
+  return (
+    <Consumer>
+      {value => (
+        <p className="text-warning">子节点=> newContext: {value.newContext}</p>
+      )}
+    </Consumer>
+  );
+}
+
+class Child2 extends React.Component {
+  static contextTypes = {
+    name: PropTypes.string
+  };
+  render() {
+    // return <p>字符串a: {this.context.name}</p>;
+    return (
+      <Consumer>
+        {value => <p className="text-info">子节点=> name: {value.name}</p>}
+      </Consumer>
+    );
+  }
+}
+// Child.contextTypes = {
+//   value: PropTypes.string
+// };
+// Parent.childContextTypes = {
+//   value: PropTypes.string,
+//   name: PropTypes.string
+// };
+
+export default () => (
+  <Parent>
+    <Child />
+    <Child2 />
+  </Parent>
+);
+```
 
 
 
+### Ref
+
+```javascript
+import React from 'react'
+
+const TargetComponent = React.forwardRef((props, ref) => (
+  <input type="text" ref={ref} />
+))
+
+export default class Comp extends React.Component {
+  constructor() {
+    super()
+    this.ref = React.createRef()//symbol
+  }
+
+  componentDidMount() {
+    this.ref.current.value = '转发ref成功🍺'
+  }
+
+  render() {
+    return <TargetComponent ref={this.ref} />
+  }
+}
+```
 
 
 
+### error
+
+componentDidCatch新的生命周期
+
+```javascript
+import React, { Component } from "react";
+
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  //捕捉错误和错误上报程序库一起使用
+  componentDidCatch(err, info) {
+    this.setState({ hasError: true });
+  }
+  render() {
+    if (this.state.hasError) {
+      return <div>Something went wrong!</div>;
+    }
+    return this.props.children;
+  }
+}
+class Profile extends Component {
+    constructor(props) {
+      super(props);
+      this.state = {  };
+    }
+    render() {
+      return <span>用户名：{this.state.user.push(1)}</span>
+    }
+  }
+
+class Greeting extends Component {
+  render() {
+    return (
+      <ErrorBoundary>
+        <Profile/>
+      </ErrorBoundary>
+    );
+  }
+}
+export default Greeting;
+```
 
 
 
+### 生命周期
 
-
-
-
-
-
-
-
-
-
-
-
-
+![Image text]([https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15%E5%A3%B0%E6%98%8E%E5%90%8E%E6%9C%9F%E6%B5%81%E7%A8%8B.png](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15声明后期流程.png))
 
 
 
