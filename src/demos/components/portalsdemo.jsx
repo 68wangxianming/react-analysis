@@ -4,8 +4,9 @@ import ReactDOM from 'react-dom'
 import "./component.css"
 //组件插槽
 const portalElm = document.createElement('div');
-portalElm.className="txtcenter"
-document.body.appendChild(portalElm)
+portalElm.className="txtcenter";
+portalElm.innerText='hello world!';
+document.body.appendChild(portalElm);
 
 class App extends React.Component {
   state = {
