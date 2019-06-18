@@ -659,5 +659,13 @@ export default Greeting;
 
 ![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15%E5%A3%B0%E6%98%8E%E5%90%8E%E6%9C%9F%E6%B5%81%E7%A8%8B.png)
 
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F.png)
+
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react16%E5%91%A8%E6%9C%9F-1.png)
+
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react16%E5%91%A8%E6%9C%9F.png)
+
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/state%E5%8F%AF%E7%94%A8%E5%91%A8%E6%9C%9F.png)
+
 
 
