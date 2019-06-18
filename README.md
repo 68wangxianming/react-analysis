@@ -657,7 +657,7 @@ export default Greeting;
 
 ### 生命周期
 
-![Image text]([https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15%E5%A3%B0%E6%98%8E%E5%90%8E%E6%9C%9F%E6%B5%81%E7%A8%8B.png))
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/lifecycle/react15%E5%A3%B0%E6%98%8E%E5%90%8E%E6%9C%9F%E6%B5%81%E7%A8%8B.png)
 
 
 
