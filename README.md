@@ -760,3 +760,178 @@ export default Greeting;
 
 
 
+#### 作用
+
+- 1.只能在函数组件中使用hooks
+- 2.函数组件业务变更无需修改成class组件
+- 3.告别了繁杂的this和难以记忆的生命周期 （useEffect）
+- 4.合并的生命周期componentDidMount、componentDidUpdate、和 componentWillUnmount
+- 5.包装自己的hooks 是基于纯命令式的api （可以讲组件里的生命周期抽出去给别的组件使用）
+- 6.更好的完成状态之间的共享 解决原来class组件内部封装问题。也解决了高阶组件和函数组件的嵌套过深
+- 7.useReducer集成redux
+- 8.useEffect接受脏操作等到react更新了DOM之后，它再依次执行我们定义的副作用函数。这里就是一个io且是异步的
+
+
+
+#### useState
+
+useState 返回有状态值，以及更新这个状态值的函数
+
+```
+const [name,setName] = useState('123');
+setName(456);//异步的
+console.log(name);//456
+```
+
+#### useEffect
+
+useEffect 接受包含命令式，可能有副作用代码的函数。(一个壳子不变，发送请求获取数据，拿回数据渲染dom)
+
+合并的生命周期componentDidMount、componentDidUpdate、和 componentWillUnmount
+
+```javascript
+  useEffect(() => {
+    console.log("component update");
+    document.title = `标题-${count} times`;
+    //后面什么都不写代表componentDidMount、componentDidUpdate
+  })
+```
+
+```javascript
+useEffect(() => {
+    console.log("component update");
+    document.title = `标题-${count} times`;
+    //后面什么都不写代表componentDidMount、componentDidUpdate
+  	//代表componentWillUnmount
+  	return ()=>{
+      console.log('unbind')
+    }
+})
+return (
+    <>
+    	<input type="button" value="增加count" onClick={increment} />
+      <span>当前count: {count}</span>
+      <input type="button" value="减少count" onClick={decrement} />
+    </>
+);
+//这样写的弊端 只要页面一动useEffect会每次都执行，所以useEffect里有ajax请求就会瞬间爆炸
+```
+
+**解决办法**
+
+```javascript
+import React, { useState, useEffect } from "react";
+
+const useCount = (initialCount = 0) => {
+  const [count, setCount] = useState(initialCount);
+  return [count, () => setCount(count + 1), () => setCount(count - 1)];
+};
+
+export default () => {
+  const [count, increment, decrement] = useCount(1);
+  //首次渲染完成
+  //   componentDidMount() {
+  //     document.title = `You clicked ${this.state.count} times`;
+  //   }
+  //更新渲染完成
+  //   componentDidUpdate() {
+  //     document.title = `You clicked ${this.state.count} times`;
+  //   }
+  //组件卸载阶段 == return function useEffect每次组件变更均执行
+  // componentWillUnmount(){
+  // }
+  useEffect(() => {
+    console.log("component update");
+    document.title = `标题-${count} times`;
+    return () => {
+      console.log("unbind");
+    };
+  }, [count]);//count变我才变
+
+  return (
+    <>
+      <input type="button" value="增加count" onClick={increment} />
+      <span>当前count: {count}</span>
+      <input type="button" value="减少count" onClick={decrement} />
+    </>
+  );
+};
+
+```
+
+#### useMemo
+
+memo —> UseMemo(指定一个参数) —> useCallback 缓存参数
+
+useMemo —> return ()=>{} == useCallback 函数
+
+#### useCallback
+
+```javascript
+import React, {
+    memo,
+    useState,
+    useEffect,
+    useCallback
+} from 'react'
+
+
+const Comp = memo((props) => {
+    useEffect(() => {
+        console.log('comp updated')
+    })
+
+    const updateValue = () => {
+        props.onClick(props.name + '1')
+    }
+
+    return <button onClick={updateValue}>button {props.name}</button>
+})
+
+
+
+export default function App() {
+    const [compName, setCompName] = useState('子组件');
+
+    const compCallback = useCallback((value) => {
+        setCompName(value)
+    }, [compName]) // 演示没有`[compName]`每次Comp都会调用effect
+
+    return (
+        <>
+            <Comp name={compName} onClick={compCallback} />
+        </>
+    )
+}
+```
+
+#### useReducer
+
+- React 本身只涉及UI层，如果搭建大型应用，必须搭配 一个前端框架。
+- Flux 是一种架构思想，专门解决软件的结构问题。它跟 MVC 架构是同一类东西，但是更加简单和清晰。
+- View: 视图层
+- Action(动作):视图层发出的消息(比如mouseClick)
+- Dispatcher(派发器):用来接收Actions、执行回调函数
+- Store(数据层):用来存放应用的状态，一旦发生变动，就提醒Views要更新页面
+
+##### Redux
+
+- Flux存在多种实现(至少15种)Redux还算不错
+
+- redux.min.js、react-redux.js、redux-thunk.min.js、
+
+- keyMirror.js、immutable.min.js、reqwest.js(fectch)、 ReduxThunk.js
+
+- 管理应用的 state 
+
+  通过 store.getState() 可以获取 state 
+  通过 store.dispatch(action) 来触发 state 更新 
+  通过 store.subscribe(listener) 来注册 state 变化监听器  通过 createStore(reducer, [initialState]) 创建
+
+- Provider(ReactRedux)注入store <Provider store={store} <App/> </Provider>
+- Actions JavaScript 普通对象 通过constants取到
+- 对应 Actions Reducer 返回规律，更具体的是返回状态 ( Redux.combineReducers返回唯一的 Reducer)。
+- Store(Redux.createStore(rootReducer,Redux.applyMiddleware(thunkMiddleware)))具体实施的载体
+- components具体React的组件但是不涉及状态
+- components->APP容器 react-redux 提供 connect 的方法链接React组件和Redux类
+
