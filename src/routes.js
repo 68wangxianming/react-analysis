@@ -24,7 +24,7 @@ import ErrorDemo from './demos/error';
 import LifecycleDemo from './demos/lifecycle';
 //react hooks
 // import HookDemo from './demos/components/puredemo-immutable';
-import HookDemo from './demos/hooks/test';
+import HookDemo from './demos/hooks/testReducer';
 //react fiber
 import FiberDemo from './demos/fiber';
 //react-call-return 父组件根据子组件的回调

@@ -935,3 +935,56 @@ export default function App() {
 - components具体React的组件但是不涉及状态
 - components->APP容器 react-redux 提供 connect 的方法链接React组件和Redux类
 
+![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/reduxdemo/1.jpg)
+
+```
+import React from "react";
+
+const {useReducer, useState, useEffect} = React;
+const dataReducer = (state, action) => {
+    switch (action.type) {
+        case "init":
+            console.log('🍌useEffect后面要加数组，不然会一直执行')
+            return {...state}
+        case "success":
+            return {...state}
+        case "fail":
+            return {...state}
+        default:
+            throw new Error("🍎Reducer")
+    }
+}
+
+
+export default function App() {
+    const [url] = useState("www.baidu.com");
+    const [state, dispatch] = useReducer(dataReducer, {
+        url
+    });
+    useEffect(() => {
+        dispatch({type: "init"});
+    },[]);
+    return (
+        <>
+            <span>{state.url}</span>
+        </>
+    )
+}
+```
+
+Redux 验证了函数式编程
+
+函数式编程
+
+容器 —> 容器里有value —> value是值 —> 值接受变形关系 —> map形成函子
+
+store —> container
+
+state —> value
+
+action —> 变形关系
+
+reducer —> map
+
+middle —> IO函子 通过（monad 异步脏操作）
+
