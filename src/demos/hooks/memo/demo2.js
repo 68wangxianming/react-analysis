@@ -8,10 +8,10 @@ const Counter = memo(props => {
 export default function App() {
   const [count, setCount] = useState(0);
   const double = useMemo(() => {
-    return count * 2;
+      return count * 2;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [count === 3]);
-  const data = "京程一灯";
+  const data = "xiaoming";
   return (
     <>
       <span>{double}</span>
