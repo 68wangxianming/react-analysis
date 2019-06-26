@@ -13,11 +13,11 @@ import PortalsDemo from './demos/components/portalsdemo';
 //异步组件和Suspense组件
 import SuspenseDemo from './demos/suspense';
 //Context api
-import ContextDemo from './demos/context';
+import ContextDemo from './demos/hooks/context/App';
 //将函数组件转换成纯组件
 import MemoDemo from './demos/memo';
 //ref新的使用方法
-import RefDemo from './demos/ref/forwardref';
+import RefDemo from './demos/hooks/ref/App';
 //错误的组件使用
 import ErrorDemo from './demos/error';
 //生命周期

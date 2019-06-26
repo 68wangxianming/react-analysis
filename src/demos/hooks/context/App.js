@@ -10,13 +10,13 @@ const ContextComp = (props, ref) => {
   const context = useContext(TestContext);
   return (
     <p>
-      {context} 
+      {context}
     </p>
   );
 };
 
 export default function App() {
-  const [name, setName] = useState("京程一灯");
+  const [name, setName] = useState("xiaoming");
   return (
     <>
       <input type="text" value={name} onChange={e => setName(e.target.value)} />

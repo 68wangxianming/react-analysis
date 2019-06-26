@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script>
+    const channel = new MessageChannel();
+    const port1 = channel.port1;
+    const port2 = channel.port2;
+    port1.onmessage=function (event) {
+        console.log("port1接受到port2的信息",event.data);
+    }
+
+    port2.postMessage("🍎")
+
+</script>
+</body>
+</html>

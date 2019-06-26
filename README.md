@@ -1,4 +1,4 @@
-### 运行
+运行
 
 npm install
 
@@ -795,6 +795,7 @@ useEffect 接受包含命令式，可能有副作用代码的函数。(一个壳
     document.title = `标题-${count} times`;
     //后面什么都不写代表componentDidMount、componentDidUpdate
   })
+
 ```
 
 ```javascript
@@ -815,6 +816,7 @@ return (
     </>
 );
 //这样写的弊端 只要页面一动useEffect会每次都执行，所以useEffect里有ajax请求就会瞬间爆炸
+
 ```
 
 **解决办法**
@@ -857,6 +859,7 @@ export default () => {
   );
 };
 
+
 ```
 
 #### useMemo
@@ -864,6 +867,70 @@ export default () => {
 memo —> UseMemo(指定一个参数) —> useCallback 缓存参数
 
 useMemo —> return ()=>{} == useCallback 函数
+
+```javascript
+import React from "react";
+const { memo, useState } = React;
+// const Counter = memo(props => {
+//   console.log("组件渲染");
+//   return <h1>{props.data}</h1>;
+// });
+//传统的写法 count发生变化 Counter组件跟着不断渲染
+const Counter = props => {
+  console.log("组件渲染");
+  return <h1>{props.data}</h1>;
+};
+export default function App() {
+  const [count, setCount] = useState(0);
+  const data = "xiaoming";
+  return (
+    <>
+      <span>{count}</span>
+      <input
+        type="button"
+        onClick={() => setCount(count + 1)}
+        value="修改count"
+      />
+      <Counter data={data} />
+    </>
+  );
+}
+
+```
+
+useMemo缓存函数
+
+```javascript
+import React from "react";
+const { memo, useMemo, useState } = React;
+const Counter = memo(props => {
+  console.log("组件渲染");
+  return <h1>{props.data}</h1>;
+});
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  const double = useMemo(() => {
+      return count * 2;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count === 3]);
+  const data = "xiaoming";
+  return (
+    <>
+      <span>{double}</span>
+      <input
+        type="button"
+        onClick={() => setCount(count + 1)}
+        value="修改count"
+      />
+      <Counter data={data} />
+    </>
+  );
+}
+
+```
+
+
 
 #### useCallback
 
@@ -903,7 +970,53 @@ export default function App() {
         </>
     )
 }
+
 ```
+
+```javascript
+import React from "react";
+const { memo, useEffect, useCallback, useMemo, useState } = React;
+const Counter = memo(props => {
+  // useEffect(() => {
+  //   console.log('子组件渲染副作用')
+  // })
+  console.log("子组件渲染");
+  return <h1 onClick={props.onClick}>{props.data}</h1>;
+});
+export default function App() {
+  console.log("父亲组件渲染");
+  const [count, setCount] = useState(0);
+  const data = "京程一灯";
+  // const onClick = () => {
+  //   console.log("Click");
+  // };
+  // useEffect(() => {
+  //   console.log('父组件副作用')
+  // })
+  // const onClick = useMemo(() => {
+  //   return () => {
+  //     console.log("Click");
+  //   };
+  // }, []);
+  const onClick = useCallback(() => {
+    console.log("Click");
+  }, []);
+  return (
+    <>
+      <span>{count}</span>
+      <input
+        type="button"
+        onClick={() => setCount(count + 1)}
+        value="修改count"
+      />
+      <Counter onClick={onClick} data={data} />
+    </>
+  );
+}
+
+```
+
+
 
 #### useReducer
 
@@ -929,10 +1042,15 @@ export default function App() {
   通过 store.subscribe(listener) 来注册 state 变化监听器  通过 createStore(reducer, [initialState]) 创建
 
 - Provider(ReactRedux)注入store <Provider store={store} <App/> </Provider>
+
 - Actions JavaScript 普通对象 通过constants取到
+
 - 对应 Actions Reducer 返回规律，更具体的是返回状态 ( Redux.combineReducers返回唯一的 Reducer)。
+
 - Store(Redux.createStore(rootReducer,Redux.applyMiddleware(thunkMiddleware)))具体实施的载体
+
 - components具体React的组件但是不涉及状态
+
 - components->APP容器 react-redux 提供 connect 的方法链接React组件和Redux类
 
 ![Image text](https://github.com/68wangxianming/react-analysis/blob/master/src/demos/reduxdemo/1.jpg)
@@ -970,6 +1088,7 @@ export default function App() {
         </>
     )
 }
+
 ```
 
 Redux 验证了函数式编程
@@ -987,4 +1106,114 @@ action —> 变形关系
 reducer —> map
 
 middle —> IO函子 通过（monad 异步脏操作）
+
+
+
+#### useContext
+
+```
+import React, {
+  createContext,
+  useState,
+  useContext,
+} from "react";
+
+const TestContext = createContext("default");
+
+const ContextComp = (props, ref) => {
+    const context = useContext(TestContext);
+  return (
+    <p>
+      {context}
+    </p>
+  );
+};
+
+export default function App() {
+  const [name, setName] = useState("xiaoming");
+  return (
+    <>
+      <input type="text" value={name} onChange={e => setName(e.target.value)} />
+      <TestContext.Provider value={name}>
+        <ContextComp />
+      </TestContext.Provider>
+    </>
+  );
+}
+```
+
+#### useRef
+
+```
+import React, {
+    forwardRef,
+    useRef,
+    useEffect,
+    useImperativeHandle
+} from "react";
+
+const ContextComp = forwardRef((props, ref) => {
+    useImperativeHandle(ref, () => ({
+        method() {
+            console.log("ref方法执行");
+        }
+    }));
+
+    return <p>子组件</p>;
+});
+
+export default function App() {
+    const ref = useRef();
+    useEffect(() => {
+        console.log("component update");
+        ref.current.method();
+        //卸载生命周期
+        return () => {
+            console.log("unbind");
+        };
+    }, []);
+    return (
+        <>
+            <ContextComp ref={ref}/>
+        </>
+    );
+}
+```
+
+### Fiber
+
+计算机科学中除了进程(Process)和线程(Thread)的概念还有一个概念叫做Fiber，英文含义就是 “纤维”，意指比Thread更细的线，也就是比线程(Thread)控制得更精密的并发处理机制。Fiber 可以 提升复杂React 应用的可响应性和性能。Fiber 即是React新的调度算法(reconciliation algorithm)现 有React中，更新过程是同步的，当组件树比较庞大的时候，浏览器主线程被React占用。用户此时输入 Input会造成页面卡顿。
+
+Fiber使用协作式多任务处理任务。将原来的整个 Virtual DOM 的更新任务拆分成一个个小的任务。每 次做完一个小任务之后，放弃一下自己的执行将主线程空闲出来，看看有没有其他的任务。如果有的话，就暂停本次任务，执行其他的任务，如果没有的话，就继续下一个任务。
+
+该window.requestIdleCallback()方法将在浏览器的空闲时段期间对要调用的函数进行排队。这使开发人员能够在主事件循环上执行后台和低优先级工作，而不会影响延迟关键事件，如动画和输入响应。函数通常以先进先出顺序调用; 但是，`timeout`如果需要，可以在无效时调用具有指定的回调，以便在超时之前运行它们。
+
+您可以`requestIdleCallback()`在空闲回调函数内调用，以便在下一次通过事件循环之前安排另一个回调。
+
+```
+const IdleCallback = requestIdleCallback((deadline) => {
+  //剩余时间
+  console.log(deadline.timeRemaining());
+  //表示时间是否超时了
+  console.log(deadline.didTimeout);
+  }, {})
+
+  console.log(performance.now());
+  requestAnimationFrame(function F(f) {
+  console.log(f, '========');
+  requestAnimationFrame(F)
+})
+
+```
+
+```
+const channel = new MessageChannel();
+const port1 = channel.port1;
+const port2 = channel.port2;
+port1.onmessage=function (event) {
+    console.log("port1接受到port2的信息",event.data);
+}
+
+port2.postMessage("🍎")
+```
 
